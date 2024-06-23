@@ -1,0 +1,10 @@
+.cache
+.dotnet
+.vscode-server
+.ssh
+.profile
+.bashrc
+.bash_logout
+.bash_history
+.wget-hsts
+.venv
