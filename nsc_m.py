@@ -164,7 +164,7 @@ def ensure_no_repeated_players_in_groups():
 
     def at_most_one(p1, p2):
         global id_variable
-        for i in range(1, num_weeks):
+        for i in range(0, num_weeks):
             tmp[i] = id_variable + 1
             M[i] = id_variable + 2
             id_variable += 2
@@ -177,17 +177,18 @@ def ensure_no_repeated_players_in_groups():
                 plus_clause([-get_variable(p1, g, w), get_variable(p2, g, w), -tmp[w]])
         
         # (1): M[1] = tmp[1]
-        plus_clause([-tmp[1], M[1]])
-        plus_clause([tmp[1], -M[1]])
+        # plus_clause([-tmp[1], M[1]])
+        # plus_clause([tmp[1], -M[1]])
 
         # (2): If M[i - 1] = 1, M[i] = 1
         for i in range(2, num_weeks): plus_clause([-M[i - 1], M[i]])
 
         # (3): If tmp[i] = 1, M[i] = 1
-        for i in range(2, num_weeks): plus_clause([-tmp[i], M[i]])
+        for i in range(1, num_weeks): plus_clause([-tmp[i], M[i]])
 
         # (4): If M[i - 1] = 0 and tmp[i] = 0, M[i] = 0
-        # for i in range(2, num_weeks): plus_clause([M[i - 1], tmp[i], -M[i]])
+        # print([M[0], tmp[1], -M[1]])
+        for i in range(1, num_weeks): plus_clause([M[i - 1], tmp[i], -M[i]])
 
         # (5): If M[i - 1] = 1, tmp[i] = 0
         for i in range(2, num_weeks + 1): plus_clause([-M[i - 1], -tmp[i]])
