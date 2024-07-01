@@ -17,7 +17,7 @@ players_per_group: int  # players per group
 num_groups: int  # number of groups
 num_players: int  # players per group * number of groups
 id_variable: int
-time_budget = 1
+time_budget = 600
 show_additional_info = True
 online_path = ''
 encoder = "binomial"
@@ -522,7 +522,7 @@ def print_to_console_and_log(*args, **kwargs):
 # solve the problem
 def run_from_input_file():
     global num_groups, players_per_group, num_weeks
-    with open(online_path + 'data.txt') as f:
+    with open(online_path + 'data1.txt') as f:
     # with open("drive/MyDrive/data.txt") as f:
         for line in f:
             num_groups, players_per_group, num_weeks = map(int, line.split())

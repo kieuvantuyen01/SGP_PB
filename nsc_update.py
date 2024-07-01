@@ -166,8 +166,8 @@ def ensure_no_repeated_players_in_groups():
         global id_variable
         for i in range(1, num_weeks):
             tmp[i] = id_variable + 1
-            M[i] = id_variable + 2
-            id_variable += 2
+            # M[i] = id_variable + 2
+            id_variable += 1
         tmp[num_weeks] = id_variable + 1
         id_variable += 1
 
@@ -175,26 +175,28 @@ def ensure_no_repeated_players_in_groups():
             for g in range(1, num_groups + 1):
                 plus_clause([-get_variable(p1, g, w), -get_variable(p2, g, w), tmp[w]])
                 plus_clause([-get_variable(p1, g, w), get_variable(p2, g, w), -tmp[w]])
+
+        for w1 in range(1, num_weeks + 1):
+            for w2 in range(w1 + 1, num_weeks + 1): plus_clause([-tmp[w1], -tmp[w2]])
         
-        # (1): M[1] = tmp[1]
-        plus_clause([-tmp[1], M[1]])
-        plus_clause([tmp[1], -M[1]])
+        # # (1): M[1] = tmp[1]
+        # plus_clause([-tmp[1], M[1]])
+        # plus_clause([tmp[1], -M[1]])
 
-        # (2): If M[i - 1] = 1, M[i] = 1
-        for i in range(2, num_weeks): plus_clause([-M[i - 1], M[i]])
+        # # (2): If M[i - 1] = 1, M[i] = 1
+        # for i in range(2, num_weeks): plus_clause([-M[i - 1], M[i]])
 
-        # (3): If tmp[i] = 1, M[i] = 1
-        for i in range(2, num_weeks): plus_clause([-tmp[i], M[i]])
+        # # (3): If tmp[i] = 1, M[i] = 1
+        # for i in range(2, num_weeks): plus_clause([-tmp[i], M[i]])
 
-        # (4): If M[i - 1] = 0 and tmp[i] = 0, M[i] = 0
+        # # (4): If M[i - 1] = 0 and tmp[i] = 0, M[i] = 0
         # for i in range(2, num_weeks): plus_clause([M[i - 1], tmp[i], -M[i]])
 
-        # (5): If M[i - 1] = 1, tmp[i] = 0
-        for i in range(2, num_weeks + 1): plus_clause([-M[i - 1], -tmp[i]])
+        # # (5): If M[i - 1] = 1, tmp[i] = 0
+        # for i in range(2, num_weeks + 1): plus_clause([-M[i - 1], -tmp[i]])
 
     for p1 in range(1, num_players + 1):
-        for p2 in range(p1 + 1, num_players + 1):
-            at_most_one(p1, p2)
+        for p2 in range(p1 + 1, num_players + 1): at_most_one(p1, p2)
 
 
 # SB1: The first week order is [1, 2, 3, ... x]
@@ -507,7 +509,7 @@ def run_pythonsat(problem_name):
     result_dict = {
         "ID": id_counter,
         "Problem": problem_name,
-        "Type": "NSC_M",
+        "Type": "nsc_update",
         # "SAT Solver": "Python SAT",
         "Time": "",
         "Result": "",
@@ -566,7 +568,7 @@ def run_kissat(problem_name):
     result_dict = {
         "ID": id_counter,
         "Problem": problem_name,
-        "Type": "NSC_M",
+        "Type": "nsc_update",
         # "SAT Solver": "KiSSAT",
         "Time": "",
         "Result": "",
@@ -585,7 +587,7 @@ def run_kissat(problem_name):
 
     def write_to_cnf():
         # Create the directory if it doesn't exist
-        input_path = online_path + "input_cnf"
+        input_path = online_path + "input_cnf/nsc_update"
         if not os.path.exists(input_path): os.makedirs(input_path)
 
         # Create the full path to the file "{problem}.cnf" in the directory "input_cnf"
@@ -615,7 +617,7 @@ def run_kissat(problem_name):
     file_path = os.path.join(output_path, file_name)
 
     print_to_console_and_log("Searching for a solution...")
-    bashCommand = f"ls input_cnf/{problem_name}.cnf | xargs -n 1 ./kissat --time={time_budget} --relaxed > {file_path}"
+    bashCommand = f"ls input_cnf/nsc_update/{problem_name}.cnf | xargs -n 1 ./kissat --time={time_budget} --relaxed" # > {file_path}"
     os.system(bashCommand)
 
     def handleFile():
@@ -645,8 +647,8 @@ def run_kissat(problem_name):
             if not check_legit(solution): sys.exit(1)
         else: print_to_console_and_log(f"UNSAT. Time run: {time_run}s.\n")
 
-    handleFile()
-    write_to_xlsx(result_dict)
+    # handleFile()
+    # write_to_xlsx(result_dict)
 
 def solve_sat_problem():
     problem_name = f"{num_groups}-{players_per_group}-{num_weeks}"
