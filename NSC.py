@@ -607,7 +607,7 @@ def print_to_console_and_log(*args, **kwargs):
 # solve the problem
 def run_from_input_file():
     global num_groups, players_per_group, num_weeks
-    with open(online_path + 'data1.txt') as f:
+    with open(online_path + 'data.txt') as f:
         for line in f:
             num_groups, players_per_group, num_weeks = map(int, line.split())
             solve_sat_problem()

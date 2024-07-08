@@ -17,7 +17,7 @@ players_per_group: int  # players per group
 num_groups: int  # number of groups
 num_players: int  # players per group * number of groups
 id_variable: int
-time_budget = 600
+time_budget = 1200
 all_clauses = []
 id_counter = 0
 
@@ -41,12 +41,12 @@ def is_prime(x: int) -> bool:
     return True
 
 def generate_all_clauses():
+    symmetry_breaking_1()
+    symmetry_breaking_2()
     ensure_no_repeated_players_in_groups()
     ensure_golfer_plays_exactly_once_per_week()
     ensure_group_contains_exactly_p_players()
     # ensure_no_repeated_players_in_groups()
-    symmetry_breaking_1()
-    symmetry_breaking_2()
     # symmetry_breaking_7()
     global num_groups, players_per_group, num_weeks
     if num_groups == players_per_group and num_weeks == players_per_group + 1:
@@ -496,7 +496,7 @@ def run_pythonsat(problem_name):
     result_dict = {
         "ID": id_counter,
         "Problem": problem_name,
-        "Type": "nsc_M4",
+        "Type": "nscM4",
         # "SAT Solver": "Python SAT",
         "Time": "",
         "Result": "",
