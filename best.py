@@ -19,7 +19,7 @@ players_per_group: int  # players per group
 num_groups: int  # number of groups
 num_players: int  # players per group * number of groups
 id_variable: int
-time_budget = 600
+time_budget = 1
 show_additional_info = True
 online_path = ''
 
@@ -100,7 +100,7 @@ def exactly_k(var: List[int], k):
     # assert n == num_players
 
     pbConfig = PBConfig()
-    pbConfig.set_PB_Encoder(pblib.PB_ADDER)
+    # pbConfig.set_PB_Encoder(pblib.PB_ADDER)
 
     # Create a Pb2cnf object
     pb2 = Pb2cnf(pbConfig)
@@ -403,7 +403,7 @@ def interrupt(s): s.interrupt()
 
 def write_to_cnf(num_vars, num_clauses, problem_name):
     # Create the directory if it doesn't exist
-    input_path = online_path + "input_cnf/ADDER"
+    input_path = online_path + "input_cnf/BEST"
     if not os.path.exists(input_path): os.makedirs(input_path)
 
     # Create the full path to the file "{problem}.cnf" in the directory "input_cnf"
@@ -486,7 +486,7 @@ def run_kissat(problem_name):
     file_path = os.path.join(input_path, file_name)
 
     print_to_console_and_log("Running KiSSAT...")
-    bashCommand = f"ls input_cnf/ADDER/{problem_name}.cnf | xargs -n 1 ./kissat --time={time_budget} --relaxed > output_kissat/{problem_name}.txt"
+    bashCommand = f"ls input_cnf/BEST/{problem_name}.cnf | xargs -n 1 ./kissat --time={time_budget} --relaxed > output_kissat/{problem_name}.txt"
     os.system(bashCommand)
     print_to_console_and_log("KiSSAT finished.")
 
@@ -501,7 +501,7 @@ def solve_sat_problem():
     result_dict = {
         "ID": id_counter,
         "Problem": f"{num_groups}-{players_per_group}-{num_weeks}",
-        "Type": "ADDER",
+        "Type": "BEST",
         "Time": "",
         "Result": "",
         "Variables": 0,

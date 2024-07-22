@@ -17,7 +17,7 @@ players_per_group: int  # players per group
 num_groups: int  # number of groups
 num_players: int  # players per group * number of groups
 id_variable: int
-time_budget = 1200
+time_budget = 1
 all_clauses = []
 id_counter = 0
 
