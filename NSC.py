@@ -17,7 +17,7 @@ players_per_group: int  # players per group
 num_groups: int  # number of groups
 num_players: int  # players per group * number of groups
 id_variable: int
-time_budget = 500
+time_budget = 600
 show_additional_info = True
 online_path = ''
 
@@ -34,12 +34,12 @@ def is_prime(x: int) -> bool:
     return True
 
 def generate_all_clauses():
-    symmetry_breaking_1()
-    symmetry_breaking_2()
     ensure_no_repeated_players_in_groups()
     ensure_golfer_plays_exactly_once_per_week()
     ensure_group_contains_exactly_p_players()
     # ensure_no_repeated_players_in_groups()
+    symmetry_breaking_1()
+    symmetry_breaking_2()
     global num_groups, players_per_group, num_weeks
     if num_groups == players_per_group and num_weeks == players_per_group + 1:
         symmetry_breaking_8()
@@ -69,12 +69,14 @@ def exactly_one(var: List[int]):
 
     # (1): (ALO)
     clause = []
-    for i in range(0, n): clause.append(var[i])
+    for i in range(0, n):
+        clause.append(var[i])
     plus_clause(clause)
 
     # (2): (AMO)
     for i in range (0, n):
-        for j in range (i + 1, n): plus_clause([-var[i], -var[j]])
+        for j in range (i + 1, n):
+            plus_clause([-1 * var[i], -1 * var[j]])
 
 # Every player plays exactly once a week
 # x_w_g (1)
@@ -96,15 +98,15 @@ def exactly_k(var: List[int], k):
         for j in range(1, min(i, k) + 1):
             id_variable += 1
             map_register[i][j] = id_variable
-    
+
     # (1): If a bit is true, the first bit of the corresponding register is true
     for i in range(1, n):
-        plus_clause([-var[i], map_register[i][1]])
+        plus_clause([-1 * var[i], map_register[i][1]])
 
     # (2): R[i - 1][j] = 1, R[i][j] = 1;
     for i in range(2, n):
         for j in range(1, min(i - 1, k) + 1):
-            plus_clause([-map_register[i - 1][j], map_register[i][j]])
+            plus_clause([-1 * map_register[i - 1][j], map_register[i][j]])
 
     # (3): If bit i is on and R[i - 1][j - 1] = 1, R[i][j] = 1;
     for i in range(2, n):
@@ -124,7 +126,7 @@ def exactly_k(var: List[int], k):
     for i in range(2, n):
         for j in range(2, min(i, k) + 1):
             plus_clause([map_register[i - 1][j - 1], -1 * map_register[i][j]])
-    
+
     # (7): (At least k) R[n - 1][k] = 1 or (n-th bit is true and R[n - 1][k - 1] = 1)
     plus_clause([map_register[n - 1][k], var[n]])
     plus_clause([map_register[n - 1][k], map_register[n - 1][k - 1]])
@@ -132,13 +134,13 @@ def exactly_k(var: List[int], k):
 
     # (8): (At most k) If i-th bit is true, R[i - 1][k] = 0;
     for i in range(k + 1, n + 1):
-        plus_clause([-var[i], -map_register[i - 1][k]])
+        plus_clause([-1 * var[i], -1 * map_register[i - 1][k]])
 
 # A group contains exactly p players
 # w_g_x (2)
 def ensure_group_contains_exactly_p_players():
     for week in range(2, num_weeks + 1):
-        for group in range(1, num_groups):
+        for group in range(1, num_groups + 1):
             list = [-1]
             for player in range(1, num_players + 1):
                 list.append(get_variable(player, group, week))
@@ -164,16 +166,31 @@ def symmetry_breaking_1():
     for player in range(1, num_players + 1):
         right_group = (player - 1) // players_per_group + 1
         for group in range(1, num_groups + 1):
-            if group == right_group: plus_clause([get_variable(player, group, 1)])
+            if group == right_group:
+                plus_clause([get_variable(player, group, 1)])
+            # else:
+            #     plus_clause([-1 * get_variable(player, group, 1)])
 
 # SB2: From week 2, first p players belong to p groups
 def symmetry_breaking_2():
     for week in range(2, num_weeks + 1):
         for player in range(1, min(num_groups, players_per_group) + 1):
             for group in range(1, num_groups + 1):
-                if group == player: plus_clause([get_variable(player, group, week)])
+                if group == player:
+                    plus_clause([get_variable(player, group, week)])
                 else:
-                    plus_clause([-get_variable(player, group, week)])
+                    plus_clause([-1 * get_variable(player, group, week)])
+
+# SB7
+def symmetry_breaking_7():
+    for week in range(2, num_weeks + 1):
+        for group in range(1, num_groups + 1):
+            for golfer1 in range(1, num_players + 1):
+                for golfer2 in range(golfer1 + 1, num_players + 1):
+                        if ((golfer1 - 1) // players_per_group == (golfer2 - 1) // players_per_group):
+                            clause = [-1 * get_variable(golfer1, group, week),
+                                      -1 * get_variable(golfer2, group, week)]
+                            plus_clause(clause)
 
 # SB8
 def symmetry_breaking_8():
@@ -196,6 +213,14 @@ def symmetry_breaking_10():
             for player in range(players_per_group + 1, 2 * players_per_group + 1):
                 if (player - diff != week):
                     plus_clause([get_variable(player, group, week), -1 * get_variable(week + diff, group, player - diff)])
+
+# The [p + 1] column is [2, 1, 2, 3, ... , g]
+def not_enough_10():
+    player = players_per_group + 1
+    for week in range(3, num_weeks + 1):
+        for group in range(1, num_groups + 1):
+            if (group == week - 1): plus_clause([get_variable(player, group, week)])
+            else: plus_clause([-get_variable(player, group, week)])
 
 # SB11
 def symmetry_breaking_11():
