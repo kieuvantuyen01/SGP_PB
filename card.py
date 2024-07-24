@@ -19,7 +19,7 @@ players_per_group: int  # players per group
 num_groups: int  # number of groups
 num_players: int  # players per group * number of groups
 id_variable: int
-time_budget = 1
+time_budget = 600
 show_additional_info = True
 online_path = ''
 
